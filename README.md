@@ -1,83 +1,66 @@
-# Nahhas LMS Website
+# Ismaik Platform - AI Learning Management System
 
-This is a Learning Management System (LMS) website built with Next.js. The purpose of this project is to provide a comprehensive platform for online education, tailored for the Syrian community.
+Une plateforme de gestion d'apprentissage (LMS) innovante construite avec Next.js, intégrant des fonctionnalités d'IA pour une expérience d'apprentissage personnalisée.
 
-## Demo Video
-
-Check out the demo video for this project on YouTube: [Demo Video](https://youtu.be/0g7wvi6tehQ)
-
----
-
-## Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
+## Table des matières
+- [Fonctionnalités](#fonctionnalités)
+- [Technologies utilisées](#technologies-utilisées)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+- [Utilisation](#utilisation)
+- [Contribution](#contribution)
+- [Licence](#licence)
 
-## Features
-- Browse & Filter Courses
-- Purchase Courses using Stripe
-- NoSQL database using Mongodb
-- Authentication using Clerk
-- ORM using Prisma
-- Mark Chapters as Completed or Uncompleted
-- Progress Calculation of each Course
-- Student Dashboard
-- Teacher mode
-- Create new Courses
-- Create new Chapters
-- Easily reorder chapter position with drag n’ drop
-- Upload thumbnails, attachments and videos using UploadThing
-- Video player using react-player
-- Rich text editor for chapter description
+## Fonctionnalités
+- Navigation et filtrage intelligent des cours
+- Système de paiement sécurisé via Stripe
+- Base de données NoSQL avec MongoDB
+- Authentification sécurisée via Clerk
+- ORM avec Prisma
+- Suivi de progression des chapitres
+- Calcul automatique de la progression des cours
+- Tableau de bord étudiant personnalisé
+- Interface enseignant
+- Création et gestion de cours
+- Gestion des chapitres avec fonction glisser-déposer
+- Gestion des médias (thumbnails, documents, vidéos)
+- Lecteur vidéo intégré
+- Éditeur de texte enrichi
+- Fonctionnalités d'IA pour l'apprentissage personnalisé
 
-## Tech Stack
+## Technologies utilisées
 - Framework: Next.js 14
-- Database: Prisma
-- Authentication: Clerk
-- UI Components: Radix UI, Shadcn/ui
-- Forms: React Hook Form
-- API Requests: Axios
-- Styling: Tailwind CSS
-- File Uploads: Uploadthing, Cloudinary
-- Markdown Support: React Markdown Preview, React MD Editor
+- Base de données: Prisma/MongoDB
+- Authentification: Clerk
+- Composants UI: Radix UI, Shadcn/ui
+- Gestion des formulaires: React Hook Form
+- Requêtes API: Axios
+- Style: Tailwind CSS
+- Gestion des fichiers: Uploadthing, Cloudinary
+- Support Markdown: React Markdown Preview, React MD Editor
+- Intégration IA: [Spécifiez vos technologies d'IA]
 
 ## Installation
 
-### Prerequisites
-Make sure you have the following installed:
+### Prérequis
 - Node.js
-- npm or yarn
+- npm ou yarn
 - Git
 
-### Clone the Repository
-To clone the project, run the following command in your terminal:
-
+### Cloner le projet
 ```bash
-git clone https://github.com/AbdulrahmanNahhas/nahhas-lms.git
+git clone https://github.com/assylk/ismaik-platform.git
+cd ismaik-platform
 ```
 
-### Navigate to the Project Directory
-```bash
-cd nahhas-lms
-```
-
-### Install Dependencies
-
-Using npm:
+### Installation des dépendances
 ```bash
 npm install
-```
-Or using yarn:
-```bash
+# ou
 yarn install
 ```
 
-### Set Up Environment Variables
-
-Create a .env.local file in the root directory and add your environment variables. Here is an example:
+### Configuration des variables d'environnement
+Créez un fichier .env.local à la racine du projet :
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
@@ -99,35 +82,31 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 STRIPE_API_KEY=
 STRIPE_WEBHOOK_SECRET=
+
+# Ajoutez vos variables d'environnement spécifiques à l'IA ici
+AI_API_KEY=
 ```
-You can also find an example environment file in .env.example.
 
-### Start the Development Server
-
-Using npm:
+### Lancer le serveur de développement
 ```bash
 npm run dev
-```
-Or using yarn:
-```bash
+# ou
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Accédez à [http://localhost:3000](http://localhost:3000) dans votre navigateur.
 
-## Usage
+## Utilisation
+La plateforme Ismaik offre une expérience d'apprentissage enrichie par l'IA. Les utilisateurs peuvent accéder aux cours, suivre leur progression et bénéficier de recommandations personnalisées basées sur leur parcours d'apprentissage.
 
-To use the LMS website, navigate to [http://localhost:3000](http://localhost:3000) in your web browser. From here, you can access all the features of the platform.
+## Contribution
+Les contributions sont les bienvenues ! Pour contribuer :
 
-## Contributing
+1. Forkez le projet
+2. Créez votre branche (`git checkout -b feature/NouvelleFonctionnalite`)
+3. Committez vos changements (`git commit -m 'Ajout d'une nouvelle fonctionnalité'`)
+4. Pushez vers la branche (`git push origin feature/NouvelleFonctionnalite`)
+5. Ouvrez une Pull Request
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes. 
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Licence
+Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
