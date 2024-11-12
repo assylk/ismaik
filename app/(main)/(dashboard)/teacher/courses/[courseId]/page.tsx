@@ -9,6 +9,7 @@ import DescriptionForm from "./_components/DescriptionForm";
 import ImageForm from "./_components/ImageForm";
 import CategoryForm from "./_components/CategoryForm";
 import PriceForm from "./_components/PriceForm";
+import TagsForm from "./_components/TagsForm";
 import ChaptersForm from "./_components/ChaptersForm";
 import { Banner } from "@/components/ui/banner";
 import Actions from "./_components/Actions";
@@ -111,6 +112,7 @@ const Course = async ({ params }: { params: { courseId: string } }) => {
               <h2 className="text-xl">Sell your course</h2>
             </div>
             <PriceForm initialData={course} courseId={courseId} />
+            <TagsForm initialData={course} courseId={courseId} />
           </div>
         </div>
       </div>

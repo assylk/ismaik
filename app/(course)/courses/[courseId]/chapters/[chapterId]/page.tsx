@@ -6,9 +6,10 @@ import { getChapter } from "@/actions/get-chapter";
 import { Banner } from "@/components/ui/banner";
 import Preview from "@/components/Preview";
 import { Button } from "@/components/ui/button";
-import { FaCheck } from "react-icons/fa6";
+import { FaCheck, FaRobot } from "react-icons/fa6";
 import CourseEnrollButton from "./_components/CourseEnrollButton";
 import CourseProgressButton from "./_components/CourseProgressButton";
+import QuizGenerator from "./_components/QuizGenerator";
 
 interface ChapterProps {
   params: {
@@ -78,6 +79,7 @@ const page = async ({ params }: ChapterProps) => {
             )}
           </div>
           <Preview value={chapter.description!} />
+          <QuizGenerator chapterContent={chapter} />
         </div>
       </div>
     </div>
