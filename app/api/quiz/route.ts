@@ -1,16 +1,45 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { redirect } from "next/navigation";
+import { auth, clerkClient } from "@clerk/nextjs";
 
-// Initialize Gemini AI
+
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 export async function POST(req: Request) {
+  const { userId } = auth();
+    if (!userId) {
+      return redirect("/");
+    }
   try {
+    
+    const user = await clerkClient.users.getUser(userId);
+    const xp: any = user.publicMetadata.xp || 0;
+    console.log("[XP]", xp);
     const { content } = await req.json();
+    console.log("[CONTENT]", content);
+    // Determine difficulty based on XP
+    let difficulty;
+    if (xp < 20) {
+      difficulty = "beginner";
+    } else if (xp < 60) {
+      difficulty = "intermediate";
+    } else {
+      difficulty = "advanced";
+    }
 
-    // Generate quiz using Gemini
-    const prompt = `Create a quiz with 5 multiple choice questions based on this text: "${content}"
+    // Modify prompt based on difficulty
+    const prompt = `Create a ${difficulty}-level quiz with 5 multiple choice questions to test understanding of this chapter content: "${content.description}"
+      
+      The questions should:
+      - Focus specifically on the key concepts and information presented in this chapter
+      - Match a ${difficulty} difficulty level where:
+        * beginner: focuses on basic recall and simple comprehension
+        * intermediate: includes application and analysis of concepts
+        * advanced: emphasizes complex analysis, evaluation, and synthesis of ideas
+      - Test ${difficulty}-appropriate understanding of the material
+      
       Return your response in this exact JSON format:
       {
         "questions": [
@@ -25,7 +54,8 @@ export async function POST(req: Request) {
       1. Use valid JSON syntax
       2. Include exactly 5 questions
       3. Provide 4 options for each question
-      4. Include the correct answer in the options array`;
+      4. Include the correct answer in the options array
+      5. Keep questions directly relevant to the chapter content`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
