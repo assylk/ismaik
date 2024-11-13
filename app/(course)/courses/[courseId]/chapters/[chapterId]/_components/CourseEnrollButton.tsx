@@ -5,7 +5,6 @@ import { formatPrice } from '@/lib/formats';
 import axios from 'axios';
 import { useState } from 'react'
 import { toast } from 'sonner';
-
 interface CourseEnrollButtonProps {
   courseId: string;
   price: number;

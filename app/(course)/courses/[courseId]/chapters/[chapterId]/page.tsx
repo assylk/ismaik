@@ -36,7 +36,8 @@ const page = async ({ params }: ChapterProps) => {
 
   const isLocked = !chapter.isFree && !purchase;
   const completeOnEnd = !!purchase && !userProgress?.isCompleted;
-
+  console.log("completeOnEnd", completeOnEnd);
+  console.log("userProgress?.isCompleted", userProgress?.isCompleted);
   return (
     <div className="h-full w-full md:container">
       {userProgress?.isCompleted && (
@@ -79,7 +80,7 @@ const page = async ({ params }: ChapterProps) => {
             )}
           </div>
           <Preview value={chapter.description!} />
-          <QuizGenerator chapterContent={chapter} />
+          <QuizGenerator chapterContent={chapter} purchase={!!userProgress?.isCompleted && !isLocked} />
         </div>
       </div>
     </div>

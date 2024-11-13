@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { redirect } from "next/navigation";
 import { auth, clerkClient } from "@clerk/nextjs";
@@ -39,6 +39,7 @@ export async function POST(req: Request) {
         * intermediate: includes application and analysis of concepts
         * advanced: emphasizes complex analysis, evaluation, and synthesis of ideas
       - Test ${difficulty}-appropriate understanding of the material
+      - Include an explanation for why the correct answer is right
       
       Return your response in this exact JSON format:
       {
@@ -46,7 +47,8 @@ export async function POST(req: Request) {
           {
             "question": "Question text here?",
             "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-            "correctAnswer": "Option 1"
+            "correctAnswer": "Option 1",
+            "explanation": "Detailed explanation of why this answer is correct and why others are incorrect"
           }
         ]
       }
@@ -55,7 +57,8 @@ export async function POST(req: Request) {
       2. Include exactly 5 questions
       3. Provide 4 options for each question
       4. Include the correct answer in the options array
-      5. Keep questions directly relevant to the chapter content`;
+      5. Keep questions directly relevant to the chapter content
+      6. Provide clear, educational explanations for each answer`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -73,42 +76,41 @@ export async function POST(req: Request) {
     // Log the raw response for debugging
     console.log("[RAW_AI_RESPONSE]", jsonStr);
 
-    // Clean and prepare the string for parsing
-    jsonStr = jsonStr.replace(/[\n\r]/g, ' ') // Remove newlines
-                    .replace(/\s+/g, ' ')      // Normalize spaces
-                    .replace(/^[^{]*/, '')     // Remove any text before the first {
-                    .replace(/}[^}]*$/, '}')   // Remove any text after the last }
-                    .trim();                   // Trim whitespace
+    // Enhanced JSON cleaning and parsing
+    jsonStr = jsonStr.replace(/```json|```/g, '') // Remove markdown code blocks
+                    .replace(/[\n\r]/g, ' ')      // Remove newlines
+                    .replace(/\s+/g, ' ')         // Normalize spaces
+                    .replace(/,\s*([}\]])/g, '$1') // Remove trailing commas
+                    .replace(/([{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1"$2":') // Quote unquoted keys
+                    .replace(/:\s*'([^']*)'/g, ':"$1"') // Convert single to double quotes
+                    .replace(/^[^{]*?(\{[\s\S]*\})[^}]*$/, '$1') // Extract only the JSON object
+                    .trim();
 
-    // Log the cleaned string
     console.log("[CLEANED_JSON_STRING]", jsonStr);
-
-    // Try to find JSON content with more flexible matching
-    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error("[JSON_EXTRACTION_FAILED]", jsonStr);
-      return NextResponse.json(defaultResponse);
-    }
 
     let parsedData;
     try {
-      parsedData = JSON.parse(jsonMatch[0]);
+        parsedData = JSON.parse(jsonStr);
     } catch (parseError) {
-      // Try to fix common JSON issues
-      const fixedJsonStr = jsonMatch[0]
-        .replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":') // Fix unquoted property names
-        .replace(/'/g, '"'); // Replace single quotes with double quotes
-      
-      try {
-        parsedData = JSON.parse(fixedJsonStr);
-      } catch (finalError) {
-        console.error("[JSON_PARSE_ERROR]", {
-          original: jsonMatch[0],
-          fixed: fixedJsonStr,
-          error: finalError
-        });
-        throw new Error("Failed to parse AI response into valid JSON");
-      }
+        console.error("[INITIAL_PARSE_ERROR]", parseError);
+        
+        // Additional fallback cleaning
+        try {
+            const fixedStr = jsonStr
+                .replace(/\\/g, '')               // Remove escape characters
+                .replace(/"\s+"/g, '" "')         // Fix spaces between quotes
+                .replace(/}\s*{/g, '},{')         // Fix object separators
+                .replace(/"\s*}/g, '"}')          // Fix trailing spaces before closing braces
+                .replace(/{\s*"/g, '{"');         // Fix leading spaces after opening braces
+            
+            parsedData = JSON.parse(fixedStr);
+        } catch (finalError) {
+            console.error("[FINAL_PARSE_ERROR]", {
+                original: jsonStr,
+                error: finalError
+            });
+            return NextResponse.json(defaultResponse);
+        }
     }
 
     // Validate the response structure
@@ -118,11 +120,24 @@ export async function POST(req: Request) {
 
     // Validate each question
     parsedData.questions.forEach((q: any, index: number) => {
-      if (!q.question || !q.options || !q.correctAnswer) {
+      if (!q.question || !q.options || !q.correctAnswer || !q.explanation) {
+        console.error(`[VALIDATION_ERROR] Missing required fields in question ${index + 1}:`, q);
         throw new Error(`Invalid question structure at index ${index}`);
       }
-      if (!q.options.includes(q.correctAnswer)) {
-        throw new Error(`Correct answer not found in options at question ${index + 1}`);
+
+      // Normalize strings for comparison
+      const normalizedOptions = q.options.map((opt: string) => opt.trim().toLowerCase());
+      const normalizedAnswer = q.correctAnswer.trim().toLowerCase();
+
+      if (!normalizedOptions.includes(normalizedAnswer)) {
+        console.error(`[VALIDATION_ERROR] Question ${index + 1}:`, {
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        });
+        
+        // Attempt to fix the issue by adding the correct answer if missing
+        q.options[3] = q.correctAnswer; // Replace last option with correct answer
+        console.log(`[VALIDATION_FIX] Added correct answer to options for question ${index + 1}`);
       }
     });
 

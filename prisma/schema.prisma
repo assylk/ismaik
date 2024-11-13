@@ -27,6 +27,8 @@ model Course {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  quizResults   QuizResult[]
+
   @@index([categoryId])
   @@fulltext([title])
 }
@@ -53,6 +55,8 @@ model Chapter {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  quizResults   QuizResult[]
 
   @@index([courseId])
 }
@@ -94,4 +98,37 @@ model StripeCustomer {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model QuizResult {
+  id            String   @id @default(uuid()) @map("_id")
+  userId        String
+  courseId      String
+  chapterId     String
+  score         Int
+  totalQuestions Int
+  answers       QuizAnswer[]
+  
+  course        Course   @relation(fields: [courseId], references: [id])
+  chapter       Chapter  @relation(fields: [chapterId], references: [id])
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([chapterId])
+}
+
+model QuizAnswer {
+  id            String     @id @default(uuid()) @map("_id")
+  quizResultId  String
+  quizResult    QuizResult @relation(fields: [quizResultId], references: [id])
+  question      String
+  userAnswer    String
+  correctAnswer String
+  isCorrect     Boolean
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([quizResultId])
 }

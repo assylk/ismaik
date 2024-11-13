@@ -52,7 +52,7 @@ const Course = async ({ params }: { params: { courseId: string } }) => {
     course.author,
     course.description,
     course.price != undefined,
-    // course.categoryId,
+   course.categoryId,
     course.chapters.some((chapter) => chapter.isPublished),
   ];
   const totalFileds = requiredFields.length;
